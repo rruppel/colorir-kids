@@ -230,23 +230,24 @@ button {
   transition: fill 140ms ease, transform 140ms ease;
 }
 
-.fill-mode > path:hover {
+.fill-mode path:hover {
   filter: brightness(0.98);
 }
 
 .linework path,
+.linework-under,
 .details path {
   fill: none;
   pointer-events: none;
-  stroke: #25312f;
+  stroke: #000000;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 7;
+  stroke-width: 3.4;
 }
 
 .details path {
-  opacity: 0.8;
-  stroke-width: 5;
+  opacity: 0.95;
+  stroke-width: 2.7;
 }
 
 .palette-panel {

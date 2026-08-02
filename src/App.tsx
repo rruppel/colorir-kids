@@ -329,15 +329,19 @@ function App() {
             >
               <rect x="0" y="0" width="320" height="320" fill="#ffffff" rx="18" />
               {selectedArtwork.regions.map((region) => (
-                <path
-                  d={region.path}
-                  fill={paints[region.id] ?? "#ffffff"}
-                  key={region.id}
-                  onPointerDown={() => paintRegion(region.id)}
-                  tabIndex={0}
-                >
-                  <title>{region.label}</title>
-                </path>
+                <g key={region.id}>
+                  <path
+                    d={region.path}
+                    fill={paints[region.id] ?? "#ffffff"}
+                    onPointerDown={() => paintRegion(region.id)}
+                    tabIndex={0}
+                  >
+                    <title>{region.label}</title>
+                  </path>
+                  {region.lineLayer === "under" ? (
+                    <path className="linework-under" d={region.path} fill="none" />
+                  ) : null}
+                </g>
               ))}
               {currentStrokes.map((stroke, index) => (
                 <polyline
@@ -361,7 +365,7 @@ function App() {
                 />
               ) : null}
               <g className="linework">
-                {selectedArtwork.regions.map((region) => (
+                {selectedArtwork.regions.filter((region) => region.lineLayer !== "under").map((region) => (
                   <path d={region.path} fill="none" key={`line-${region.id}`} />
                 ))}
               </g>
@@ -412,11 +416,16 @@ function MiniArtwork({ artwork }: { artwork: Artwork }) {
   return (
     <svg viewBox={artwork.viewBox} aria-hidden="true">
       <rect x="0" y="0" width="320" height="320" rx="22" fill="#ffffff" />
-      {artwork.regions.slice(0, 7).map((region) => (
-        <path d={region.path} fill="#ffffff" key={region.id} />
+      {artwork.regions.map((region) => (
+        <g key={region.id}>
+          <path d={region.path} fill="#ffffff" />
+          {region.lineLayer === "under" ? (
+            <path className="linework-under" d={region.path} fill="none" />
+          ) : null}
+        </g>
       ))}
       <g className="linework">
-        {artwork.regions.slice(0, 7).map((region) => (
+        {artwork.regions.filter((region) => region.lineLayer !== "under").map((region) => (
           <path d={region.path} fill="none" key={region.id} />
         ))}
       </g>

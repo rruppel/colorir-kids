@@ -1,6 +1,7 @@
 export type Region = {
   id: string;
   label: string;
+  lineLayer?: "under" | "over";
   path: string;
 };
 
@@ -58,25 +59,30 @@ export const artworks: Artwork[] = [
     viewBox: "0 0 320 320",
     regions: [
       { id: "sky", label: "Ceu", path: "M22 22h276v276H22Z" },
-      { id: "mountain-left", label: "Montanha esquerda", path: "M22 230 88 102l72 128Z" },
-      { id: "mountain-right", label: "Montanha direita", path: "M152 234 234 76l64 158Z" },
-      { id: "lava", label: "Lava", path: "M210 122c16-20 32-20 48 0l-12 25-14-15-15 17Z" },
-      { id: "tail", label: "Cauda", path: "M66 200c-22 1-34-9-43-25 30-6 59 4 77 26Z" },
-      { id: "body", label: "Corpo", path: "M70 205c0-45 39-82 91-82h41c47 0 82 32 82 72 0 44-42 72-99 72h-39c-45 0-76-24-76-62Z" },
-      { id: "neck", label: "Pescoco", path: "M179 127c-7-45 14-78 49-78 28 0 51 20 51 47 0 30-26 50-59 46-15-2-29-7-41-15Z" },
-      { id: "head", label: "Cabeca", path: "M218 42c43 0 74 20 74 48 0 27-27 49-64 49-29 0-52-15-52-41 0-32 15-56 42-56Z" },
-      { id: "belly", label: "Barriga", path: "M111 210c12-27 43-47 78-47 34 0 59 18 66 43-20 22-50 33-88 33-27 0-46-9-56-29Z" },
-      { id: "spots", label: "Manchas", path: "M117 181c0-9 8-17 18-17s18 8 18 17-8 17-18 17-18-8-18-17Zm54 34c0-9 8-16 17-16s17 7 17 16-8 16-17 16-17-7-17-16Zm55-42c0-8 7-15 16-15s16 7 16 15-7 15-16 15-16-7-16-15Z" },
-      { id: "ground", label: "Chao", path: "M22 263c45 19 226 20 276 0v35H22Z" },
+      { id: "volcano", label: "Vulcao", lineLayer: "under", path: "M185 159 232 64l50 95Z" },
+      { id: "crater", label: "Cratera", lineLayer: "under", path: "M216 81c10-8 22-8 32 0l-9 18c-5-5-9-8-14-8s-9 3-14 8Z" },
+      { id: "lava", label: "Lava", lineLayer: "under", path: "M221 99c4-5 8-8 13-8s8 3 12 8l-8 34-11-14-11 14Z" },
+      { id: "cloud", label: "Nuvem", lineLayer: "under", path: "M50 66c6-14 20-20 34-16 7-11 23-13 33-3 15-2 27 9 27 23 0 15-12 26-27 26H69c-14 0-23-11-19-30Z" },
+      { id: "ground", label: "Chao", lineLayer: "under", path: "M22 267c44 13 230 13 276 0v31H22Z" },
+      { id: "tail", label: "Cauda", path: "M91 203c-25 6-48-1-66-19 26-14 56-8 81 17Z" },
+      { id: "body", label: "Corpo", path: "M86 204c0-39 35-69 82-69 48 0 83 30 83 69 0 38-35 65-83 65-47 0-82-27-82-65Z" },
+      { id: "belly", label: "Barriga", path: "M116 211c14-24 36-38 62-38 29 0 51 16 61 41-15 20-39 30-71 30-26 0-44-11-52-33Z" },
+      { id: "neck", label: "Pescoco", path: "M207 139c-1-30 13-52 35-56 17 18 17 45 1 66-12 1-24-3-36-10Z" },
+      { id: "head", label: "Cabeca", path: "M238 75c30 0 53 16 53 37s-23 37-53 37c-26 0-45-14-45-35 0-23 18-39 45-39Z" },
+      { id: "leg-left", label: "Perna esquerda", path: "M124 255h34v30h-49c0-14 5-24 15-30Z" },
+      { id: "leg-right", label: "Perna direita", path: "M190 255h34c10 6 15 16 15 30h-49Z" },
+      { id: "spot-a", label: "Mancha pequena", path: "M126 190c0-8 7-15 15-15s15 7 15 15-7 15-15 15-15-7-15-15Z" },
+      { id: "spot-b", label: "Mancha media", path: "M176 220c0-8 7-14 15-14s15 6 15 14-7 14-15 14-15-6-15-14Z" },
+      { id: "spot-c", label: "Mancha grande", path: "M227 184c0-7 6-13 13-13s13 6 13 13-6 13-13 13-13-6-13-13Z" },
     ],
     details: [
-      { id: "face", path: "M242 83c0-5 4-9 9-9s9 4 9 9M239 106c15 8 29 8 44 0", width: 4 },
-      { id: "teeth", path: "M226 118l7 12 7-12M246 121l6 11 7-12", width: 3 },
-      { id: "plates", path: "M96 155l14-28 17 27M128 137l16-31 18 30M163 126l18-32 18 33", width: 5 },
-      { id: "legs", path: "M128 253v29M193 255v29M117 282h31M184 284h31", width: 5 },
-      { id: "claws", path: "M147 282l11 6M147 282l-11 6M214 284l11 6M214 284l-11 6", width: 3 },
-      { id: "mountain-lines", path: "M81 121l13 34 21-16M222 101l13 38 19-24M205 148l27-16 29 17", width: 4 },
-      { id: "plants", path: "M48 264c8-19 18-19 27 0M274 262c-10-20-20-20-30 0", width: 4 },
+      { id: "face", path: "M248 103c0-3 2-5 5-5s5 2 5 5M239 123c10 7 25 7 36 0", width: 2.5 },
+      { id: "nostril", path: "M276 110c0-3 2-5 5-5", width: 2.5 },
+      { id: "plates", path: "M103 160l18-26 18 26M142 143l19-28 20 28M184 145l17-25 17 25", width: 3 },
+      { id: "toes", path: "M116 285h42M198 285h42M130 285l-7 7M145 285l7 7M204 285l-7 7M222 285l7 7", width: 2.5 },
+      { id: "volcano-lines", path: "M208 158l20-37 14 37M228 64v25M246 70l-9 22", width: 2.7 },
+      { id: "plants", path: "M48 267c6-14 13-14 20 0M274 267c-7-14-15-14-22 0", width: 2.7 },
+      { id: "bubbles", path: "M165 70c0-5 4-9 9-9s9 4 9 9-4 9-9 9-9-4-9-9ZM64 118c0-4 3-7 7-7s7 3 7 7-3 7-7 7-7-3-7-7ZM286 45c0-4 3-7 7-7s7 3 7 7-3 7-7 7-7-3-7-7Z", width: 2.3 },
     ],
   },
   {
