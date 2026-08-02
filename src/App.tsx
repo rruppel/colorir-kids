@@ -37,6 +37,8 @@ const palette = [
 const defaultPaints = (artwork: Artwork): PaintMap =>
   Object.fromEntries(artwork.regions.map((region) => [region.id, "#ffffff"]));
 
+const categoryRank = new Map(categories.map((item, index) => [item, index]));
+
 const getInitialArtworkId = () => {
   const params = new URLSearchParams(window.location.search);
   const artworkId = params.get("art");
@@ -67,11 +69,17 @@ function App() {
   const currentStrokes = strokes[selectedArtwork.id] ?? [];
 
   const filteredArtworks = useMemo(() => {
-    if (category === "Todos") {
-      return artworks;
-    }
+    return artworks
+      .map((art, index) => ({ art, index }))
+      .filter(({ art }) => category === "Todos" || art.category === category)
+      .sort((left, right) => {
+        const categoryOrder =
+          (categoryRank.get(left.art.category) ?? categories.length) -
+          (categoryRank.get(right.art.category) ?? categories.length);
 
-    return artworks.filter((art) => art.category === category);
+        return categoryOrder || left.index - right.index;
+      })
+      .map(({ art }) => art);
   }, [category]);
 
   useEffect(() => {
