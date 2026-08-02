@@ -1,4 +1,5 @@
 import {
+  ArrowLeft,
   Brush,
   Download,
   Eraser,
@@ -8,7 +9,7 @@ import {
   Sparkles,
   Undo2,
 } from "lucide-react";
-import { PointerEvent, useMemo, useRef, useState } from "react";
+import { PointerEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Artwork, artworks, categories } from "./artworks";
 
 type Tool = "fill" | "brush" | "eraser";
@@ -36,8 +37,14 @@ const palette = [
 const defaultPaints = (artwork: Artwork): PaintMap =>
   Object.fromEntries(artwork.regions.map((region) => [region.id, "#ffffff"]));
 
+const getInitialArtworkId = () => {
+  const params = new URLSearchParams(window.location.search);
+  const artworkId = params.get("art");
+  return artworks.some((artwork) => artwork.id === artworkId) ? artworkId : null;
+};
+
 function App() {
-  const [selectedArtworkId, setSelectedArtworkId] = useState(artworks[0].id);
+  const [selectedArtworkId, setSelectedArtworkId] = useState<string | null>(() => getInitialArtworkId());
   const [category, setCategory] = useState<string>("Todos");
   const [tool, setTool] = useState<Tool>("fill");
   const [color, setColor] = useState(palette[0]);
@@ -55,6 +62,7 @@ function App() {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   const selectedArtwork = artworks.find((art) => art.id === selectedArtworkId) ?? artworks[0];
+  const isPainting = selectedArtworkId !== null;
   const paints = paintsByArtwork[selectedArtwork.id] ?? defaultPaints(selectedArtwork);
   const currentStrokes = strokes[selectedArtwork.id] ?? [];
 
@@ -65,6 +73,17 @@ function App() {
 
     return artworks.filter((art) => art.category === category);
   }, [category]);
+
+  useEffect(() => {
+    const syncArtworkFromUrl = () => {
+      setSelectedArtworkId(getInitialArtworkId());
+      setDraftStroke("");
+      setIsDrawing(false);
+    };
+
+    window.addEventListener("popstate", syncArtworkFromUrl);
+    return () => window.removeEventListener("popstate", syncArtworkFromUrl);
+  }, []);
 
   const pushHistory = () => {
     setHistoryByArtwork((current) => ({
@@ -232,8 +251,21 @@ function App() {
     window.print();
   };
 
+  const openArtwork = (artworkId: string) => {
+    setSelectedArtworkId(artworkId);
+    window.history.pushState(null, "", `?art=${artworkId}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const backToGallery = () => {
+    setSelectedArtworkId(null);
+    window.history.pushState(null, "", window.location.pathname);
+    setDraftStroke("");
+    setIsDrawing(false);
+  };
+
   return (
-    <main className="app">
+    <main className={isPainting ? "app painting-app" : "app gallery-app"}>
       <header className="topbar">
         <div className="brand">
           <div className="brand-mark" aria-hidden="true">
@@ -245,27 +277,29 @@ function App() {
           </div>
         </div>
 
-        <div className="category-tabs" aria-label="Categorias">
-          {["Todos", ...categories].map((item) => (
-            <button
-              className={item === category ? "active" : ""}
-              key={item}
-              onClick={() => setCategory(item)}
-              type="button"
-            >
-              {item}
-            </button>
-          ))}
-        </div>
+        {!isPainting ? (
+          <div className="category-tabs" aria-label="Categorias">
+            {["Todos", ...categories].map((item) => (
+              <button
+                className={item === category ? "active" : ""}
+                key={item}
+                onClick={() => setCategory(item)}
+                type="button"
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </header>
 
-      <section className="workspace" aria-label="Area de colorir">
-        <aside className="gallery" aria-label="Desenhos">
+      {!isPainting ? (
+        <section className="home-gallery" aria-label="Desenhos">
           {filteredArtworks.map((artwork) => (
             <button
-              className={artwork.id === selectedArtwork.id ? "art-card selected" : "art-card"}
+              className="art-card"
               key={artwork.id}
-              onClick={() => setSelectedArtworkId(artwork.id)}
+              onClick={() => openArtwork(artwork.id)}
               type="button"
             >
               <MiniArtwork artwork={artwork} />
@@ -273,145 +307,151 @@ function App() {
               <small>{artwork.category} · {artwork.age}</small>
             </button>
           ))}
-        </aside>
+        </section>
+      ) : (
+        <section className="workspace" aria-label="Area de colorir">
+          <section className="studio">
+            <div className="toolstrip" aria-label="Ferramentas">
+              <button aria-label="Galeria" className="icon-button" onClick={backToGallery} title="Galeria" type="button">
+                <ArrowLeft size={22} />
+              </button>
+              <span className="divider" />
+              <button
+                aria-label="Balde"
+                className={tool === "fill" ? "icon-button active" : "icon-button"}
+                onClick={() => setTool("fill")}
+                title="Balde"
+                type="button"
+              >
+                <PaintBucket size={22} />
+              </button>
+              <button
+                aria-label="Pincel"
+                className={tool === "brush" ? "icon-button active" : "icon-button"}
+                onClick={() => setTool("brush")}
+                title="Pincel"
+                type="button"
+              >
+                <Brush size={22} />
+              </button>
+              <button
+                aria-label="Borracha"
+                className={tool === "eraser" ? "icon-button active" : "icon-button"}
+                onClick={() => setTool("eraser")}
+                title="Borracha"
+                type="button"
+              >
+                <Eraser size={22} />
+              </button>
+              <span className="divider" />
+              <button aria-label="Desfazer" className="icon-button" onClick={undo} title="Desfazer" type="button">
+                <Undo2 size={22} />
+              </button>
+              <button aria-label="Recomecar" className="icon-button" onClick={restart} title="Recomecar" type="button">
+                <RotateCcw size={22} />
+              </button>
+              <button aria-label="Baixar PNG" className="icon-button" onClick={download} title="Baixar PNG" type="button">
+                <Download size={22} />
+              </button>
+              <button aria-label="Imprimir" className="icon-button" onClick={print} title="Imprimir" type="button">
+                <Printer size={22} />
+              </button>
+            </div>
 
-        <section className="studio">
-          <div className="toolstrip" aria-label="Ferramentas">
-            <button
-              aria-label="Balde"
-              className={tool === "fill" ? "icon-button active" : "icon-button"}
-              onClick={() => setTool("fill")}
-              title="Balde"
-              type="button"
-            >
-              <PaintBucket size={22} />
-            </button>
-            <button
-              aria-label="Pincel"
-              className={tool === "brush" ? "icon-button active" : "icon-button"}
-              onClick={() => setTool("brush")}
-              title="Pincel"
-              type="button"
-            >
-              <Brush size={22} />
-            </button>
-            <button
-              aria-label="Borracha"
-              className={tool === "eraser" ? "icon-button active" : "icon-button"}
-              onClick={() => setTool("eraser")}
-              title="Borracha"
-              type="button"
-            >
-              <Eraser size={22} />
-            </button>
-            <span className="divider" />
-            <button aria-label="Voltar" className="icon-button" onClick={undo} title="Voltar" type="button">
-              <Undo2 size={22} />
-            </button>
-            <button aria-label="Recomecar" className="icon-button" onClick={restart} title="Recomecar" type="button">
-              <RotateCcw size={22} />
-            </button>
-            <button aria-label="Baixar PNG" className="icon-button" onClick={download} title="Baixar PNG" type="button">
-              <Download size={22} />
-            </button>
-            <button aria-label="Imprimir" className="icon-button" onClick={print} title="Imprimir" type="button">
-              <Printer size={22} />
-            </button>
-          </div>
-
-          <div className="canvas-shell">
-            <svg
-              className={tool === "fill" ? "coloring-page fill-mode" : "coloring-page draw-mode"}
-              ref={svgRef}
-              role="img"
-              aria-label={selectedArtwork.title}
-              viewBox={selectedArtwork.viewBox}
-              onPointerDown={beginDraw}
-              onPointerMove={continueDraw}
-              onPointerUp={finishDraw}
-              onPointerCancel={finishDraw}
-              onPointerLeave={finishDraw}
-            >
-              <rect x="0" y="0" width="320" height="320" fill="#ffffff" rx="18" />
-              {selectedArtwork.regions.map((region) => (
-                <g key={region.id}>
-                  <path
-                    d={region.path}
-                    fill={paints[region.id] ?? "#ffffff"}
-                    onPointerDown={(event) => handleRegionPointerDown(event, region.id)}
-                  >
-                    <title>{region.label}</title>
-                  </path>
-                  {region.lineLayer === "under" ? (
-                    <path className="linework-under" d={region.path} fill="none" />
-                  ) : null}
-                </g>
-              ))}
-              {currentStrokes.map((stroke, index) => (
-                <polyline
-                  fill="none"
-                  key={`${selectedArtwork.id}-${index}`}
-                  points={stroke.points}
-                  stroke={stroke.color}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="13"
-                />
-              ))}
-              {draftStroke ? (
-                <polyline
-                  fill="none"
-                  points={draftStroke}
-                  stroke={tool === "eraser" ? "#ffffff" : color}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="13"
-                />
-              ) : null}
-              <g className="linework">
-                {selectedArtwork.regions.filter((region) => region.lineLayer !== "under").map((region) => (
-                  <path d={region.path} fill="none" key={`line-${region.id}`} />
-                ))}
-              </g>
-              {selectedArtwork.details?.length ? (
-                <g className="details">
-                  {selectedArtwork.details.map((detail) => (
+            <div className="canvas-shell">
+              <svg
+                className={tool === "fill" ? "coloring-page fill-mode" : "coloring-page draw-mode"}
+                ref={svgRef}
+                role="img"
+                aria-label={selectedArtwork.title}
+                viewBox={selectedArtwork.viewBox}
+                onPointerDown={beginDraw}
+                onPointerMove={continueDraw}
+                onPointerUp={finishDraw}
+                onPointerCancel={finishDraw}
+                onPointerLeave={finishDraw}
+              >
+                <rect x="0" y="0" width="320" height="320" fill="#ffffff" rx="18" />
+                {selectedArtwork.regions.map((region) => (
+                  <g key={region.id}>
                     <path
-                      d={detail.path}
-                      fill="none"
-                      key={`detail-${detail.id}`}
-                      strokeWidth={Math.min(detail.width ?? 1.8, 2.4)}
-                    />
+                      d={region.path}
+                      fill={paints[region.id] ?? "#ffffff"}
+                      onPointerDown={(event) => handleRegionPointerDown(event, region.id)}
+                    >
+                      <title>{region.label}</title>
+                    </path>
+                    {region.lineLayer === "under" ? (
+                      <path className="linework-under" d={region.path} fill="none" />
+                    ) : null}
+                  </g>
+                ))}
+                {currentStrokes.map((stroke, index) => (
+                  <polyline
+                    fill="none"
+                    key={`${selectedArtwork.id}-${index}`}
+                    points={stroke.points}
+                    stroke={stroke.color}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="13"
+                  />
+                ))}
+                {draftStroke ? (
+                  <polyline
+                    fill="none"
+                    points={draftStroke}
+                    stroke={tool === "eraser" ? "#ffffff" : color}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="13"
+                  />
+                ) : null}
+                <g className="linework">
+                  {selectedArtwork.regions.filter((region) => region.lineLayer !== "under").map((region) => (
+                    <path d={region.path} fill="none" key={`line-${region.id}`} />
                   ))}
                 </g>
-              ) : null}
-            </svg>
-          </div>
-        </section>
+                {selectedArtwork.details?.length ? (
+                  <g className="details">
+                    {selectedArtwork.details.map((detail) => (
+                      <path
+                        d={detail.path}
+                        fill="none"
+                        key={`detail-${detail.id}`}
+                        strokeWidth={Math.min(detail.width ?? 1.8, 2.4)}
+                      />
+                    ))}
+                  </g>
+                ) : null}
+              </svg>
+            </div>
+          </section>
 
-        <aside className="palette-panel" aria-label="Cores">
-          <label htmlFor="custom-color">Cor</label>
-          <input
-            id="custom-color"
-            type="color"
-            value={color}
-            onChange={(event) => setColor(event.target.value)}
-          />
-          <div className="palette">
-            {palette.map((paint) => (
-              <button
-                aria-label={`Selecionar ${paint}`}
-                className={paint === color ? "swatch selected" : "swatch"}
-                key={paint}
-                onClick={() => setColor(paint)}
-                style={{ backgroundColor: paint }}
-                title={paint}
-                type="button"
-              />
-            ))}
-          </div>
-        </aside>
-      </section>
+          <aside className="palette-panel" aria-label="Cores">
+            <label htmlFor="custom-color">Cor</label>
+            <input
+              id="custom-color"
+              type="color"
+              value={color}
+              onChange={(event) => setColor(event.target.value)}
+            />
+            <div className="palette">
+              {palette.map((paint) => (
+                <button
+                  aria-label={`Selecionar ${paint}`}
+                  className={paint === color ? "swatch selected" : "swatch"}
+                  key={paint}
+                  onClick={() => setColor(paint)}
+                  style={{ backgroundColor: paint }}
+                  title={paint}
+                  type="button"
+                />
+              ))}
+            </div>
+          </aside>
+        </section>
+      )}
     </main>
   );
 }

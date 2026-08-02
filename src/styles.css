@@ -37,6 +37,11 @@ button {
   padding: 18px;
 }
 
+.painting-app {
+  min-height: 100dvh;
+  padding-bottom: 12px;
+}
+
 .topbar {
   align-items: center;
   display: flex;
@@ -108,61 +113,90 @@ button {
 .workspace {
   display: grid;
   gap: 16px;
-  grid-template-columns: 240px minmax(0, 1fr) 112px;
+  grid-template-columns: minmax(0, 1fr) 112px;
   margin: 0 auto;
   max-width: 1420px;
 }
 
-.gallery,
+.home-gallery,
 .palette-panel,
 .studio {
   min-width: 0;
 }
 
-.gallery {
-  align-content: start;
+.home-gallery {
+  background: #4e6667;
+  border: 4px solid #25312f;
+  border-radius: 8px;
+  box-shadow: 8px 8px 0 #25312f;
   display: grid;
-  gap: 10px;
-  max-height: calc(100vh - 106px);
-  overflow: auto;
-  padding: 4px 4px 12px 0;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  margin: 0 auto;
+  max-width: 980px;
+  padding: 22px;
 }
 
 .art-card {
-  background: #ffffff;
+  background: var(--card-color, #ffca3a);
   border: 3px solid #25312f;
   border-radius: 8px;
   box-shadow: 4px 4px 0 #25312f;
-  color: #25312f;
+  color: #ffffff;
   display: grid;
-  gap: 7px;
-  padding: 9px;
-  text-align: left;
+  gap: 9px;
+  padding: 12px;
+  text-align: center;
+  text-shadow: 2px 2px 0 rgba(37, 49, 47, 0.45);
 }
 
-.art-card.selected,
 .art-card:hover {
-  background: #eaffb9;
+  transform: translateY(-2px);
 }
 
 .art-card svg {
   aspect-ratio: 1;
-  background: #fffdf7;
+  background: #ffffff;
   border: 2px solid #25312f;
   border-radius: 6px;
   width: 100%;
 }
 
 .art-card span {
-  font-size: 0.96rem;
+  font-size: 1.08rem;
   font-weight: 900;
   line-height: 1.1;
+  text-transform: uppercase;
 }
 
 .art-card small {
-  color: #60716e;
+  color: #ffffff;
   font-size: 0.78rem;
   font-weight: 800;
+}
+
+.home-gallery .art-card:nth-child(6n + 1) {
+  --card-color: #ffca3a;
+}
+
+.home-gallery .art-card:nth-child(6n + 2) {
+  --card-color: #e71d36;
+}
+
+.home-gallery .art-card:nth-child(6n + 3) {
+  --card-color: #5cc8df;
+}
+
+.home-gallery .art-card:nth-child(6n + 4) {
+  --card-color: #fb8500;
+}
+
+.home-gallery .art-card:nth-child(6n + 5) {
+  --card-color: #8ac926;
+}
+
+.home-gallery .art-card:nth-child(6n) {
+  --card-color: #c05299;
 }
 
 .studio {
@@ -170,7 +204,7 @@ button {
   display: grid;
   gap: 12px;
   grid-template-rows: auto minmax(0, 1fr);
-  min-height: calc(100vh - 106px);
+  min-height: calc(100dvh - 106px);
 }
 
 .toolstrip {
@@ -221,8 +255,8 @@ button {
   border: 4px solid #25312f;
   border-radius: 8px;
   box-shadow: 8px 8px 0 #25312f;
-  max-height: calc(100vh - 188px);
-  max-width: min(82vh, 100%);
+  max-height: calc(100dvh - 184px);
+  max-width: min(calc(100dvh - 184px), 100%);
   touch-action: none;
   user-select: none;
   width: 100%;
@@ -314,13 +348,8 @@ button {
     grid-template-columns: 1fr;
   }
 
-  .gallery {
-    grid-auto-columns: 150px;
-    grid-auto-flow: column;
-    grid-template-columns: none;
-    max-height: none;
-    overflow-x: auto;
-    padding-bottom: 10px;
+  .home-gallery {
+    max-width: 760px;
   }
 
   .studio {
@@ -328,8 +357,8 @@ button {
   }
 
   .coloring-page {
-    max-height: none;
-    max-width: min(100%, 720px);
+    max-height: min(calc(100dvh - 250px), 760px);
+    max-width: min(100%, calc(100dvh - 250px), 760px);
   }
 
   .palette-panel {
@@ -351,6 +380,10 @@ button {
 @media (max-width: 640px) {
   .app {
     padding: 12px;
+  }
+
+  .painting-app {
+    padding: 8px;
   }
 
   .brand {
@@ -377,8 +410,25 @@ button {
     flex: 0 0 auto;
   }
 
-  .gallery {
-    grid-auto-columns: 128px;
+  .home-gallery {
+    border-width: 3px;
+    box-shadow: 5px 5px 0 #25312f;
+    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 12px;
+  }
+
+  .art-card {
+    gap: 7px;
+    padding: 8px;
+  }
+
+  .art-card span {
+    font-size: 0.84rem;
+  }
+
+  .art-card small {
+    font-size: 0.68rem;
   }
 
   .toolstrip {
@@ -391,6 +441,13 @@ button {
     flex: 0 0 44px;
     height: 44px;
     width: 44px;
+  }
+
+  .coloring-page {
+    border-width: 3px;
+    box-shadow: 4px 4px 0 #25312f;
+    max-height: calc(100dvh - 218px);
+    max-width: min(100%, calc(100dvh - 218px));
   }
 
   .palette-panel {
