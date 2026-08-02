@@ -6,7 +6,7 @@ import {
   Printer,
   RotateCcw,
   Sparkles,
-  Trash2,
+  Undo2,
 } from "lucide-react";
 import { PointerEvent, useMemo, useRef, useState } from "react";
 import { Artwork, artworks, categories } from "./artworks";
@@ -34,9 +34,7 @@ const palette = [
 ];
 
 const defaultPaints = (artwork: Artwork): PaintMap =>
-  Object.fromEntries(
-    artwork.regions.map((region) => [region.id, region.defaultColor ?? "#ffffff"]),
-  );
+  Object.fromEntries(artwork.regions.map((region) => [region.id, "#ffffff"]));
 
 function App() {
   const [selectedArtworkId, setSelectedArtworkId] = useState(artworks[0].id);
@@ -117,7 +115,7 @@ function App() {
     }));
   };
 
-  const clear = () => {
+  const restart = () => {
     pushHistory();
     setPaintsByArtwork((current) => ({
       ...current,
@@ -181,7 +179,7 @@ function App() {
       ...current,
       [selectedArtwork.id]: [
         ...currentStrokes,
-        { color: tool === "eraser" ? "#fffdf7" : color, points: draftStroke },
+        { color: tool === "eraser" ? "#ffffff" : color, points: draftStroke },
       ],
     }));
     setDraftStroke("");
@@ -302,11 +300,11 @@ function App() {
               <Eraser size={22} />
             </button>
             <span className="divider" />
-            <button aria-label="Desfazer" className="icon-button" onClick={undo} title="Desfazer" type="button">
-              <RotateCcw size={22} />
+            <button aria-label="Voltar" className="icon-button" onClick={undo} title="Voltar" type="button">
+              <Undo2 size={22} />
             </button>
-            <button aria-label="Limpar" className="icon-button" onClick={clear} title="Limpar" type="button">
-              <Trash2 size={22} />
+            <button aria-label="Recomecar" className="icon-button" onClick={restart} title="Recomecar" type="button">
+              <RotateCcw size={22} />
             </button>
             <button aria-label="Baixar PNG" className="icon-button" onClick={download} title="Baixar PNG" type="button">
               <Download size={22} />
@@ -329,7 +327,7 @@ function App() {
               onPointerCancel={finishDraw}
               onPointerLeave={finishDraw}
             >
-              <rect x="0" y="0" width="320" height="320" fill="#fffdf7" rx="18" />
+              <rect x="0" y="0" width="320" height="320" fill="#ffffff" rx="18" />
               {selectedArtwork.regions.map((region) => (
                 <path
                   d={region.path}
@@ -356,7 +354,7 @@ function App() {
                 <polyline
                   fill="none"
                   points={draftStroke}
-                  stroke={tool === "eraser" ? "#fffdf7" : color}
+                  stroke={tool === "eraser" ? "#ffffff" : color}
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth="13"
@@ -367,6 +365,18 @@ function App() {
                   <path d={region.path} fill="none" key={`line-${region.id}`} />
                 ))}
               </g>
+              {selectedArtwork.details?.length ? (
+                <g className="details">
+                  {selectedArtwork.details.map((detail) => (
+                    <path
+                      d={detail.path}
+                      fill="none"
+                      key={`detail-${detail.id}`}
+                      style={{ strokeWidth: detail.width }}
+                    />
+                  ))}
+                </g>
+              ) : null}
             </svg>
           </div>
         </section>
@@ -401,15 +411,27 @@ function App() {
 function MiniArtwork({ artwork }: { artwork: Artwork }) {
   return (
     <svg viewBox={artwork.viewBox} aria-hidden="true">
-      <rect x="0" y="0" width="320" height="320" rx="22" fill="#fffdf7" />
+      <rect x="0" y="0" width="320" height="320" rx="22" fill="#ffffff" />
       {artwork.regions.slice(0, 7).map((region) => (
-        <path d={region.path} fill={region.defaultColor ?? "#ffffff"} key={region.id} />
+        <path d={region.path} fill="#ffffff" key={region.id} />
       ))}
       <g className="linework">
         {artwork.regions.slice(0, 7).map((region) => (
           <path d={region.path} fill="none" key={region.id} />
         ))}
       </g>
+      {artwork.details?.length ? (
+        <g className="details">
+          {artwork.details.slice(0, 5).map((detail) => (
+            <path
+              d={detail.path}
+              fill="none"
+              key={detail.id}
+              style={{ strokeWidth: detail.width }}
+            />
+          ))}
+        </g>
+      ) : null}
     </svg>
   );
 }
