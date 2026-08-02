@@ -88,6 +88,11 @@ function App() {
     }));
   };
 
+  const handleRegionPointerDown = (event: PointerEvent<SVGPathElement>, regionId: string) => {
+    event.preventDefault();
+    paintRegion(regionId);
+  };
+
   const undo = () => {
     const history = historyByArtwork[selectedArtwork.id] ?? [];
 
@@ -333,8 +338,7 @@ function App() {
                   <path
                     d={region.path}
                     fill={paints[region.id] ?? "#ffffff"}
-                    onPointerDown={() => paintRegion(region.id)}
-                    tabIndex={0}
+                    onPointerDown={(event) => handleRegionPointerDown(event, region.id)}
                   >
                     <title>{region.label}</title>
                   </path>
@@ -376,7 +380,7 @@ function App() {
                       d={detail.path}
                       fill="none"
                       key={`detail-${detail.id}`}
-                      style={{ strokeWidth: detail.width }}
+                      strokeWidth={Math.min(detail.width ?? 1.8, 2.4)}
                     />
                   ))}
                 </g>
@@ -436,7 +440,7 @@ function MiniArtwork({ artwork }: { artwork: Artwork }) {
               d={detail.path}
               fill="none"
               key={detail.id}
-              style={{ strokeWidth: detail.width }}
+              strokeWidth={Math.min(detail.width ?? 1.8, 2.4)}
             />
           ))}
         </g>

@@ -20,6 +20,7 @@ body {
   background:
     linear-gradient(90deg, rgba(255, 223, 91, 0.2) 0 14%, transparent 14% 100%),
     linear-gradient(180deg, #f8fffd 0%, #fff9ee 54%, #f5fbff 100%);
+  -webkit-tap-highlight-color: transparent;
 }
 
 button,
@@ -223,11 +224,18 @@ button {
   max-height: calc(100vh - 188px);
   max-width: min(82vh, 100%);
   touch-action: none;
+  user-select: none;
   width: 100%;
 }
 
 .coloring-page path {
+  outline: none;
   transition: fill 140ms ease, transform 140ms ease;
+}
+
+.coloring-page path:focus,
+.coloring-page path:focus-visible {
+  outline: none;
 }
 
 .fill-mode path:hover {
@@ -242,12 +250,12 @@ button {
   stroke: #000000;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 3.4;
+  stroke-width: 2.35;
 }
 
 .details path {
   opacity: 0.95;
-  stroke-width: 2.7;
+  stroke-width: 1.9;
 }
 
 .palette-panel {
