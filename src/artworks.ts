@@ -78,9 +78,8 @@ export const artworks: Artwork[] = [
     details: [
       { id: "face", path: "M248 103c0-3 2-5 5-5s5 2 5 5M239 123c10 7 25 7 36 0", width: 2.5 },
       { id: "nostril", path: "M276 110c0-3 2-5 5-5", width: 2.5 },
-      { id: "plates", path: "M103 160l18-26 18 26M142 143l19-28 20 28M184 145l17-25 17 25", width: 3 },
+      { id: "plates", path: "M102 158l17-24 17 24M139 144l18-26 18 26M177 144l16-23 16 23", width: 3 },
       { id: "toes", path: "M116 285h42M198 285h42M130 285l-7 7M145 285l7 7M204 285l-7 7M222 285l7 7", width: 2.5 },
-      { id: "volcano-lines", path: "M208 158l20-37 14 37M228 64v25M246 70l-9 22", width: 2.7 },
       { id: "plants", path: "M48 267c6-14 13-14 20 0M274 267c-7-14-15-14-22 0", width: 2.7 },
       { id: "bubbles", path: "M165 70c0-5 4-9 9-9s9 4 9 9-4 9-9 9-9-4-9-9ZM64 118c0-4 3-7 7-7s7 3 7 7-3 7-7 7-7-3-7-7ZM286 45c0-4 3-7 7-7s7 3 7 7-3 7-7 7-7-3-7-7Z", width: 2.3 },
     ],
