@@ -39,6 +39,16 @@ const defaultPaints = (artwork: Artwork): PaintMap =>
 
 const categoryRank = new Map(categories.map((item, index) => [item, index]));
 
+const parseViewBox = (viewBox: string) => {
+  const [x, y, width, height] = viewBox.split(/\s+/).map(Number);
+
+  if ([x, y, width, height].some((value) => !Number.isFinite(value))) {
+    return { x: 0, y: 0, width: 320, height: 320 };
+  }
+
+  return { x, y, width, height };
+};
+
 const getInitialArtworkId = () => {
   const params = new URLSearchParams(window.location.search);
   const artworkId = params.get("art");
@@ -67,6 +77,7 @@ function App() {
   const isPainting = selectedArtworkId !== null;
   const paints = paintsByArtwork[selectedArtwork.id] ?? defaultPaints(selectedArtwork);
   const currentStrokes = strokes[selectedArtwork.id] ?? [];
+  const selectedViewBox = parseViewBox(selectedArtwork.viewBox);
 
   const filteredArtworks = useMemo(() => {
     return artworks
@@ -379,7 +390,14 @@ function App() {
                 onPointerCancel={finishDraw}
                 onPointerLeave={finishDraw}
               >
-                <rect x="0" y="0" width="320" height="320" fill="#ffffff" rx="18" />
+                <rect
+                  x={selectedViewBox.x}
+                  y={selectedViewBox.y}
+                  width={selectedViewBox.width}
+                  height={selectedViewBox.height}
+                  fill="#ffffff"
+                  rx="18"
+                />
                 {selectedArtwork.regions.map((region) => (
                   <g key={region.id}>
                     <path
@@ -465,9 +483,11 @@ function App() {
 }
 
 function MiniArtwork({ artwork }: { artwork: Artwork }) {
+  const viewBox = parseViewBox(artwork.viewBox);
+
   return (
     <svg viewBox={artwork.viewBox} aria-hidden="true">
-      <rect x="0" y="0" width="320" height="320" rx="22" fill="#ffffff" />
+      <rect x={viewBox.x} y={viewBox.y} width={viewBox.width} height={viewBox.height} rx="22" fill="#ffffff" />
       {artwork.regions.map((region) => (
         <g key={region.id}>
           <path d={region.path} fill="#ffffff" />
