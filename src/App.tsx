@@ -433,12 +433,24 @@ function App() {
                     strokeWidth="13"
                   />
                 ) : null}
-                <g className="linework">
-                  {selectedArtwork.regions.filter((region) => region.lineLayer !== "under").map((region) => (
-                    <path d={region.path} fill="none" key={`line-${region.id}`} />
-                  ))}
-                </g>
-                {selectedArtwork.details?.length ? (
+                {selectedArtwork.lineImage ? (
+                  <image
+                    href={selectedArtwork.lineImage}
+                    x={selectedViewBox.x}
+                    y={selectedViewBox.y}
+                    width={selectedViewBox.width}
+                    height={selectedViewBox.height}
+                    pointerEvents="none"
+                    preserveAspectRatio="xMidYMid meet"
+                  />
+                ) : (
+                  <g className="linework">
+                    {selectedArtwork.regions.filter((region) => region.lineLayer !== "under").map((region) => (
+                      <path d={region.path} fill="none" key={`line-${region.id}`} />
+                    ))}
+                  </g>
+                )}
+                {selectedArtwork.details?.length && !selectedArtwork.lineImage ? (
                   <g className="details">
                     {selectedArtwork.details.map((detail) => (
                       <path
@@ -496,12 +508,24 @@ function MiniArtwork({ artwork }: { artwork: Artwork }) {
           ) : null}
         </g>
       ))}
-      <g className="linework">
-        {artwork.regions.filter((region) => region.lineLayer !== "under").map((region) => (
-          <path d={region.path} fill="none" key={region.id} />
-        ))}
-      </g>
-      {artwork.details?.length ? (
+      {artwork.lineImage ? (
+        <image
+          href={artwork.lineImage}
+          x={viewBox.x}
+          y={viewBox.y}
+          width={viewBox.width}
+          height={viewBox.height}
+          pointerEvents="none"
+          preserveAspectRatio="xMidYMid meet"
+        />
+      ) : (
+        <g className="linework">
+          {artwork.regions.filter((region) => region.lineLayer !== "under").map((region) => (
+            <path d={region.path} fill="none" key={region.id} />
+          ))}
+        </g>
+      )}
+      {artwork.details?.length && !artwork.lineImage ? (
         <g className="details">
           {artwork.details.slice(0, 5).map((detail) => (
             <path
